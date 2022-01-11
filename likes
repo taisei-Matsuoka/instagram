@@ -5,6 +5,7 @@ import os
 import datetime
 import csv
 import sys
+import openpyxl
 
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -62,14 +63,13 @@ def likes():
         # if i % 40 == 0:
         time.sleep(random.randint(2, 5))    
         driver.find_elements_by_class_name('_9AhH0')[i].click()
-        time.sleep(random.randint(2, 10))
-        like  = driver.find_element_by_css_selector('body > div._2dDPU.QPGbb.CkGkG > div._32yJO > div > article > div > div.HP0qD > div > div > div.eo2As > section.ltpMr.Slqrh > span.fr66n > button > div > span > svg').get_attribute('aria-label')
         time.sleep(random.randint(2,5))
-        if not like == 'いいね！':
+        try:
+            driver.find_element_by_css_selector('body > div.RnEpo._Yhr4 > div.pbNvD.QZZGH.bW6vo > div > article > div > div.HP0qD > div > div > div.eo2As > section.ltpMr.Slqrh > span.fr66n > button > div.QBdPU.rrUvL > span > svg').click()
+        except:
             pass
-        else:
-            like  = driver.find_element_by_css_selector('body > div._2dDPU.QPGbb.CkGkG > div._32yJO > div > article > div > div.HP0qD > div > div > div.eo2As > section.ltpMr.Slqrh > span.fr66n > button > div > span > svg').click()
-        driver.find_element_by_css_selector('body > div._2dDPU.QPGbb.CkGkG > div.qF0y9.Igw0E.IwRSH.eGOV_._4EzTm.BI4qX.qJPeX.fm1AK.TxciK.yiMZG > button').click()
+        time.sleep(random.randint(2,5))
+        driver.find_element_by_css_selector('body > div.RnEpo._Yhr4 > div.NOTWr > button > div > svg').click()
         
         if i % 30 ==0:
             height = driver.execute_script("return document.body.scrollHeight")
@@ -79,10 +79,41 @@ def likes():
         else:
             pass
 
-
+def follows():
+    username = 'kintorenosyuukann'
+    password = 'taisei1223'
+    dt_now = datetime.datetime.now()
+    date = dt_now.strftime('%Y年%m月%d')
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    DOMAIN_BASE = "https://instagram.com/"
+    login_url = DOMAIN_BASE + "accounts/login/"
+    driver.get(login_url)
+    wait_time = 10
+    time.sleep(2)
+    wait = WebDriverWait(driver, wait_time).until(EC.presence_of_all_elements_located((By.NAME,'username')))
+    driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[1]/div/label/input').send_keys(username)
+    driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[2]/div/label/input').send_keys(password)
+    driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[3]/button/div').click()
+    time.sleep(2)
+    after_login = WebDriverWait(driver, wait_time).until(EC.presence_of_all_elements_located((By.CLASS_NAME,'f5C5x')))
+    after_login01 = driver.find_element_by_xpath('//*[@id="react-root"]/section/main/div/div/div/div/button').click()
+    after_login = WebDriverWait(driver, wait_time).until(EC.presence_of_all_elements_located((By.CLASS_NAME,'mt3GC')))
+    after_login01 = driver.find_element_by_css_selector('.aOOlW.HoLwm').click()
+    driver.get('https://www.instagram.com/kintorenosyuukann/')
+    followers = driver.find_element_by_xpath('//*[@id="react-root"]/section/main/div/header/section/ul/li[2]/a/span').text
+    wb = openpyxl.load_workbook("C:\workspace\scraiping\instagram\insta.xlsx")
+    sheet = wb['Sheet1']
+    last_cell  =sheet.max_row
+    output_cell = int(last_cell)+1
+    sheet.cell(output_cell,1).value = date
+    sheet.cell(output_cell,2).value = int(followers)
+    wb.save("C:\workspace\scraiping\instagram\insta.xlsx")
+    
+#%%
+follows()
 
 #%%
-keyword_list = ['ダイエット']
+keyword_list = ['朝活','白湯']
 driver = get_driver()
 # driver = webdriver.Chrome(ChromeDriverManager().install())
 DOMAIN_BASE = "https://instagram.com/"
